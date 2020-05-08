@@ -11,7 +11,5 @@ module.exports = {
         secret: process.env.JWT_SECRET,
         expiresIn: process.env.JWT_EXPIRES_IN,
     },
-    riotConfig: {
-        key: process.env.RIOT_API,
-    },
+    riotKey: process.env.RIOT_API,
 };

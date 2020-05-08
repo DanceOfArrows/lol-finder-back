@@ -1,10 +1,11 @@
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const createError = require('http-errors');
 const express = require('express');
 const logger = require('morgan');
 const path = require('path');
 
+const { environment } = require("./config");
+const { ValidationError } = require("sequelize");
 const champRotation = require('./routes/champRotation');
 const summonerMastery = require('./routes/summonerMastery');
 const summonerHistory = require('./routes/summonerHistory');
@@ -20,24 +21,36 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use('/', champRotation);
-app.use('/mastery', summonerMastery);
-app.use('/match-history', summonerHistory);
-app.use('/summoner', summonerInfo);
+// app.use('/mastery', summonerMastery);
+// app.use('/match-history', summonerHistory);
+// app.use('/summoner', summonerInfo);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+
+// Catch unhandled requests and forward to error handler.
+app.use((req, res, next) => {
+  const err = new Error("The requested resource couldn't be found.");
+  err.errors = ["The requested resource couldn't be found."];
+  err.status = 404;
+  next(err);
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use((err, req, res, next) => {
+  if (err instanceof ValidationError) {
+    err.errors = err.errors.map((e) => e.message);
+    err.title = "Sequelize Error";
+  }
+  next(err);
+});
 
-  // render the error page
+app.use((err, req, res, next) => {
+  console.log(err);
   res.status(err.status || 500);
-  res.render('error');
+  const isProduction = environment === "production";
+  res.json({
+    title: err.title || "Server Error",
+    errors: err.errors,
+    stack: isProduction ? null : err.stack,
+  });
 });
 
 module.exports = app;
