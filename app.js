@@ -7,6 +7,7 @@ const path = require('path');
 const { environment } = require("./config");
 const { ValidationError } = require("sequelize");
 const champRotation = require('./routes/champRotation');
+const regionControl = require('./routes/regionControl');
 const summonerMastery = require('./routes/summonerMastery');
 const summonerHistory = require('./routes/summonerHistory');
 const summonerInfo = require('./routes/summonerInfo');
@@ -21,6 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use('/', champRotation);
+app.use('/', regionControl);
 // app.use('/mastery', summonerMastery);
 // app.use('/match-history', summonerHistory);
 // app.use('/summoner', summonerInfo);
