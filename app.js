@@ -5,7 +5,6 @@ const logger = require('morgan');
 const path = require('path');
 
 const { environment } = require("./config");
-const { ValidationError } = require("sequelize");
 const champRotation = require('./routes/champRotation');
 const regionControl = require('./routes/regionControl');
 const summonerMastery = require('./routes/summonerMastery');
@@ -23,7 +22,7 @@ app.use(cors());
 
 app.use('/', champRotation);
 app.use('/', regionControl);
-// app.use('/mastery', summonerMastery);
+app.use('/mastery', summonerMastery);
 // app.use('/match-history', summonerHistory);
 // app.use('/summoner', summonerInfo);
 
@@ -33,14 +32,6 @@ app.use((req, res, next) => {
   const err = new Error("The requested resource couldn't be found.");
   err.errors = ["The requested resource couldn't be found."];
   err.status = 404;
-  next(err);
-});
-
-app.use((err, req, res, next) => {
-  if (err instanceof ValidationError) {
-    err.errors = err.errors.map((e) => e.message);
-    err.title = "Sequelize Error";
-  }
   next(err);
 });
 
