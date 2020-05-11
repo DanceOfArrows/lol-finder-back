@@ -20,8 +20,6 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
             headers: { 'X-Riot-Token': riotKey }
         });
 
-        console.log(masteriesRes.status)
-
         if (masteriesRes.ok) {
             const masteryScores = await masteriesRes.json();
             const masteriesConvertedPromise = masteryScores.map(async score => {

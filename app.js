@@ -23,7 +23,7 @@ app.use(cors());
 app.use('/', champRotation);
 app.use('/', regionControl);
 app.use('/mastery', summonerMastery);
-// app.use('/match-history', summonerHistory);
+app.use('/match-history', summonerHistory);
 // app.use('/summoner', summonerInfo);
 
 

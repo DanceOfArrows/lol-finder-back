@@ -9,6 +9,7 @@ Feature List:
   * Champion Mastery
   * Current rank
   * Match history
+* Use of back end to hide API key and to filter return data
 
 List of Riot API's used:  
 * Champion
