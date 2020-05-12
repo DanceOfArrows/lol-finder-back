@@ -6,7 +6,7 @@ const { riotKey } = require('../config');
 
 const router = express.Router();
 
-//All champion mastery
+// All champion mastery
 router.get('/:summonerName', asyncHandler(async (req, res, next) => {
     try {
         const summonerInfoRes = await getSummonerInfo(req.params.summonerName);
@@ -41,7 +41,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
     }
 }));
 
-//Total mastery score
+// Total mastery score
 router.get('/:summonerName/score', asyncHandler(async (req, res, next) => {
     try {
         const summonerInfoRes = await getSummonerInfo(req.params.summonerName);
@@ -67,7 +67,7 @@ router.get('/:summonerName/score', asyncHandler(async (req, res, next) => {
 
 }));
 
-//Specific champion mastery
+// Specific champion mastery
 router.get('/:summonerName/:championName', asyncHandler(async (req, res, next) => {
     try {
         const summonerInfoRes = await getSummonerInfo(req.params.summonerName);

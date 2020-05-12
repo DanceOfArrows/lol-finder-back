@@ -9,7 +9,7 @@ const champRotation = require('./routes/champRotation');
 const regionControl = require('./routes/regionControl');
 const summonerMastery = require('./routes/summonerMastery');
 const summonerHistory = require('./routes/summonerHistory');
-const summonerInfo = require('./routes/summonerInfo');
+const summonerLeague = require('./routes/summonerLeague');
 
 const app = express();
 
@@ -20,11 +20,17 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/', champRotation);
-app.use('/', regionControl);
-app.use('/mastery', summonerMastery);
-app.use('/match-history', summonerHistory);
-// app.use('/summoner', summonerInfo);
+// Middleware to set default region to NA1
+app.use(function (req, res, next) {
+  req.app.region = 'NA1';
+  next();
+});
+
+app.use('/', champRotation); // Free champ rotation
+app.use('/', regionControl); // Change region to make requests to
+app.use('/mastery', summonerMastery); // Mastery points
+app.use('/match-history', summonerHistory); // Match history of player
+app.use('/league', summonerLeague) // Player rank
 
 
 // Catch unhandled requests and forward to error handler.

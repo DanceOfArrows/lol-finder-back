@@ -13,10 +13,10 @@ const { riotKey } = require('../config');
 
 const router = express.Router();
 
-//Get all matches by user
+// Get all matches by user
 router.get('/:summonerName', asyncHandler(async (req, res, next) => {
     try {
-        //Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
+        // Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
         const championId = req.query.champion;
         const queueId = req.query.queue;
         const seasonId = req.query.season;
@@ -51,7 +51,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
         if (matchHistoryRes.ok) {
             const matchHistory = await matchHistoryRes.json();
 
-            //Removal of unneccessary / private data and conversion of numbers to readable data
+            // Removal of unneccessary / private data and conversion of numbers to readable data
             const matchesPromise = matchHistory.matches.map(async match => {
                 const matchId = match.gameId;
                 const champion = await convertChampionId(match.champion);
@@ -70,7 +70,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
     }
 }));
 
-//Get details of a single match
+// Get details of a single match
 router.get('/:summonerName/:matchId', asyncHandler(async (req, res, next) => {
     try {
         const matchId = req.params.matchId;
@@ -81,7 +81,7 @@ router.get('/:summonerName/:matchId', asyncHandler(async (req, res, next) => {
 
         if (matchInfoRes.ok) {
             const match = await matchInfoRes.json();
-            //Removal of unneccessary / private data
+            // Removal of unneccessary / private data
             const { gameDuration, teams, participants, participantIdentities } = match;
             const playerInfo = participantIdentities.map(participant => {
                 const player = participant.player;

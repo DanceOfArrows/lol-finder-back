@@ -9,14 +9,14 @@ const router = express.Router();
 // Display free champion rotation on home page
 router.get('/', asyncHandler(async (req, res) => {
     try {
-        const regionUrl = handleRegionRequests(globalRegion); //change URL based on given region
+        const regionUrl = handleRegionRequests(globalRegion); // change URL based on given region
         const getRotationRes = await fetch(`${regionUrl}/lol/platform/v3/champion-rotations/`, {
             headers: { 'X-Riot-Token': riotKey }
         });
 
         if (getRotationRes.ok) {
             const rotations = await getRotationRes.json();
-            const freeRotation = await convertFreeRotation(rotations); //convert champion IDs to champion names
+            const freeRotation = await convertFreeRotation(rotations); // convert champion IDs to champion names
 
             res.json(freeRotation);
         } else {

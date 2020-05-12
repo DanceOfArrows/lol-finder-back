@@ -37,9 +37,6 @@ BackEnd Routes
      * Get matchlist for specified summoner
    * `/match-history/:matchId `
      * Get match by match ID
-5. Summoner
-   * `/summoner/:summonerName`
-     * Get summoner by summoner name
 
 FrontEnd Routes  
 1. Home Page (`/`)
