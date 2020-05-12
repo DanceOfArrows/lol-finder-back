@@ -7,9 +7,9 @@ const { riotKey } = require('../config');
 const router = express.Router();
 
 // Display free champion rotation on home page
-router.get('/', asyncHandler(async (req, res) => {
+router.get('/', asyncHandler(async (req, res, next) => {
     try {
-        const regionUrl = handleRegionRequests(globalRegion); // change URL based on given region
+        const regionUrl = handleRegionRequests(req.session.region); // change URL based on given region
         const getRotationRes = await fetch(`${regionUrl}/lol/platform/v3/champion-rotations/`, {
             headers: { 'X-Riot-Token': riotKey }
         });

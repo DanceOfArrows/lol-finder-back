@@ -63,8 +63,8 @@ const convertSeasonId = async (seasonId) => {
 };
 
 //Gets the summoner info from riot in order to use encrypted id, accountId, etc.
-const getSummonerInfo = async (summonerName) => {
-    const regionUrl = handleRegionRequests(globalRegion);
+const getSummonerInfo = async (summonerName, region) => {
+    const regionUrl = handleRegionRequests(region);
     const res = await fetch(`${regionUrl}/lol/summoner/v4/summoners/by-name/${summonerName}`, {
         headers: { 'X-Riot-Token': riotKey }
     });
@@ -105,18 +105,18 @@ const getChampionId = async (championName) => {
 }
 
 //Returns the URL of the region depending on the global region variable.
-const handleRegionRequests = () => {
-    if (globalRegion === 'BR1') return BR1;
-    if (globalRegion === 'EUN1') return EUN1;
-    if (globalRegion === 'EUW1') return EUW1;
-    if (globalRegion === 'JP1') return JP1;
-    if (globalRegion === 'KR') return KR;
-    if (globalRegion === 'LA1') return LA1;
-    if (globalRegion === 'LA2') return LA2;
-    if (globalRegion === 'NA1') return NA1;
-    if (globalRegion === 'OC1') return OC1;
-    if (globalRegion === 'TR1') return TR1;
-    if (globalRegion === 'RU') return RU;
+const handleRegionRequests = (region) => {
+    if (region === 'BR1') return BR1;
+    if (region === 'EUN1') return EUN1;
+    if (region === 'EUW1') return EUW1;
+    if (region === 'JP1') return JP1;
+    if (region === 'KR') return KR;
+    if (region === 'LA1') return LA1;
+    if (region === 'LA2') return LA2;
+    if (region === 'NA1') return NA1;
+    if (region === 'OC1') return OC1;
+    if (region === 'TR1') return TR1;
+    if (region === 'RU') return RU;
 };
 
 //Error handler for all thing Riot

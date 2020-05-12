@@ -23,7 +23,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
         const startIndex = req.query.startIndex;
         const endIndex = req.query.endIndex;
 
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName);
+        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.session.region);
         if (summonerInfoRes.errors) {
             throw summonerInfoRes;
         }
@@ -43,7 +43,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
 
         const joinedUrlQueries = championId || queueId || seasonId || startIndex || endIndex ? '?' + joinQueries() : ''
 
-        const regionUrl = handleRegionRequests(globalRegion);
+        const regionUrl = handleRegionRequests(req.session.region);
         const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}${joinedUrlQueries}`, {
             headers: { 'X-Riot-Token': riotKey }
         });
@@ -74,7 +74,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
 router.get('/:summonerName/:matchId', asyncHandler(async (req, res, next) => {
     try {
         const matchId = req.params.matchId;
-        const regionUrl = handleRegionRequests(globalRegion);
+        const regionUrl = handleRegionRequests(req.session.region);
         const matchInfoRes = await fetch(`${regionUrl}/lol/match/v4/matches/${matchId}`, {
             headers: { 'X-Riot-Token': riotKey }
         });

@@ -4,6 +4,7 @@ const { asyncHandler } = require('../utils');
 
 const router = express.Router();
 
+// Check region change
 const regionCheck = (requestRegion) => {
     // if requestRegion is not equal to any regions, return false 
     if (requestRegion !== 'BR1' &&
@@ -23,8 +24,7 @@ const regionCheck = (requestRegion) => {
     return true;
 }
 
-// Ignore below => Attempting to send region from session storage instead of setting global var
-router.put('/region', asyncHandler(async (req, res, next) => {
+router.put('/', asyncHandler(async (req, res, next) => {
     try {
         const { region } = req.body;
 
@@ -43,10 +43,11 @@ router.put('/region', asyncHandler(async (req, res, next) => {
     }
 }))
 
-router.get('/region', asyncHandler(async (req, res, next) => {
-    console.log(req.session.region);
-    res.json(`The current region is ${req.session.region}`);
-}))
+// Keep for testing region if something breaks :)
+// router.get('/', asyncHandler(async (req, res, next) => {
+//     console.log(req.session.region);
+//     res.json(`The current region is ${req.session.region}`);
+// }))
 
 
 module.exports = router;

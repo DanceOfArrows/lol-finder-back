@@ -19,8 +19,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+}));
 app.use(session({
+  resave: false,
+  saveUninitialized: false,
   secret: "this is a secret yes."
 }));
 
@@ -31,7 +35,7 @@ app.use(function (req, res, next) {
 });
 
 app.use('/', champRotation); // Free champ rotation
-app.use('/', regionControl); // Change region to make requests to
+app.use('/region', regionControl); // Change region to make requests to
 app.use('/mastery', summonerMastery); // Mastery points
 app.use('/match-history', summonerHistory); // Match history of player
 app.use('/league', summonerLeague) // Player rank
