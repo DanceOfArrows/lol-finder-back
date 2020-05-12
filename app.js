@@ -1,6 +1,7 @@
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const express = require('express');
+const session = require('express-session');
 const logger = require('morgan');
 const path = require('path');
 
@@ -19,10 +20,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
+app.use(session({
+  secret: "this is a secret yes."
+}));
 
 // Middleware to set default region to NA1
 app.use(function (req, res, next) {
-  req.app.region = 'NA1';
+  if (!req.session.region) req.session.region = 'NA1';
   next();
 });
 

@@ -24,7 +24,7 @@ const regionCheck = (requestRegion) => {
 }
 
 // Ignore below => Attempting to send region from session storage instead of setting global var
-router.put('/', asyncHandler(async (req, res, next) => {
+router.put('/region', asyncHandler(async (req, res, next) => {
     try {
         const { region } = req.body;
 
@@ -36,16 +36,16 @@ router.put('/', asyncHandler(async (req, res, next) => {
             throw err;
         }
 
-        req.app.region = region
-        res.json(`Region has been set to ${req.app.region}`)
+        req.session.region = region
+        res.json(`Region has been set to ${req.session.region}`)
     } catch (e) {
         next(e);
     }
 }))
 
 router.get('/region', asyncHandler(async (req, res, next) => {
-    console.log(req.app.region);
-    res.json(`The current region is ${req.app.region}`);
+    console.log(req.session.region);
+    res.json(`The current region is ${req.session.region}`);
 }))
 
 
