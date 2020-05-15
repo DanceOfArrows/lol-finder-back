@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "per-env",
+    "start": "node ./app.js",
     "start:development": "nodemon -r dotenv/config ./bin/www",
     "start:production": "./bin/www"
   },
