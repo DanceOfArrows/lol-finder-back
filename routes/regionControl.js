@@ -43,11 +43,11 @@ router.put('/', asyncHandler(async (req, res, next) => {
     }
 }))
 
-// Keep for testing region if something breaks :)
-// router.get('/', asyncHandler(async (req, res, next) => {
-//     console.log(req.session.region);
-//     res.json(`The current region is ${req.session.region}`);
-// }))
+//Keep for testing region if something breaks :)
+router.get('/', asyncHandler(async (req, res, next) => {
+    console.log(req.session.region);
+    res.json(`The current region is ${req.session.region}`);
+}))
 
 
 module.exports = router;

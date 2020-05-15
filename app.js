@@ -34,7 +34,7 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use('/', champRotation); // Free champ rotation
+app.use('/rotation', champRotation); // Free champ rotation
 app.use('/region', regionControl); // Change region to make requests to
 app.use('/mastery', summonerMastery); // Mastery points
 app.use('/match-history', summonerHistory); // Match history of player
