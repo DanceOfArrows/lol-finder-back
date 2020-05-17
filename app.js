@@ -1,13 +1,11 @@
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const express = require('express');
-const session = require('cookie-session');
 const logger = require('morgan');
 const path = require('path');
 
 const { environment } = require("./config");
 const champRotation = require('./routes/champRotation');
-const regionControl = require('./routes/regionControl');
 const summonerMastery = require('./routes/summonerMastery');
 const summonerHistory = require('./routes/summonerHistory');
 const summonerLeague = require('./routes/summonerLeague');
@@ -22,7 +20,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
 app.use('/rotation', champRotation); // Free champ rotation
-app.use('/region', regionControl); // Change region to make requests to
 app.use('/mastery', summonerMastery); // Mastery points
 app.use('/match-history', summonerHistory); // Match history of player
 app.use('/league', summonerLeague) // Player rank
