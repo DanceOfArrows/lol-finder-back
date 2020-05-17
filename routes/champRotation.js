@@ -1,15 +1,18 @@
 const express = require('express');
 const fetch = require("node-fetch");
 
-const { asyncHandler, convertFreeRotation, handleRegionRequests, riotErrorHandling } = require('../utils');
+const { asyncHandler, convertFreeRotation, handleRegionRequests, regionCheck, riotErrorHandling } = require('../utils');
 const { riotKey } = require('../config');
 
 const router = express.Router();
 
 // Display free champion rotation on home page
-router.get('/', asyncHandler(async (req, res, next) => {
+router.get('/:region', asyncHandler(async (req, res, next) => {
     try {
-        const regionUrl = handleRegionRequests(req.session.region); // change URL based on given region
+        const checkRegion = regionCheck(req.params.region);
+        if (checkRegion.errors) throw checkRegion;
+
+        const regionUrl = handleRegionRequests(req.params.region); // change URL based on given region
         const getRotationRes = await fetch(`${regionUrl}/lol/platform/v3/champion-rotations/`, {
             headers: { 'X-Riot-Token': riotKey }
         });

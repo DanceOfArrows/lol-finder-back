@@ -7,6 +7,7 @@ const { asyncHandler,
     convertSeasonId,
     getSummonerInfo,
     handleRegionRequests,
+    regionCheck,
     riotErrorHandling
 } = require('../utils');
 const { riotKey } = require('../config');
@@ -14,7 +15,7 @@ const { riotKey } = require('../config');
 const router = express.Router();
 
 // Get all matches by user
-router.get('/:summonerName', asyncHandler(async (req, res, next) => {
+router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
     try {
         // Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
         const championId = req.query.champion;
@@ -23,7 +24,10 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
         const startIndex = req.query.startIndex;
         const endIndex = req.query.endIndex;
 
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.session.region);
+        const checkRegion = regionCheck(req.params.region);
+        if (checkRegion.errors) throw checkRegion;
+
+        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.params.region);
         if (summonerInfoRes.errors) {
             throw summonerInfoRes;
         }
@@ -43,7 +47,7 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
 
         const joinedUrlQueries = championId || queueId || seasonId || startIndex || endIndex ? '?' + joinQueries() : ''
 
-        const regionUrl = handleRegionRequests(req.session.region);
+        const regionUrl = handleRegionRequests(req.params.region);
         const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}${joinedUrlQueries}`, {
             headers: { 'X-Riot-Token': riotKey }
         });
@@ -71,10 +75,13 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
 }));
 
 // Get details of a single match
-router.get('/:summonerName/:matchId', asyncHandler(async (req, res, next) => {
+router.get('/:region/:summonerName/:matchId', asyncHandler(async (req, res, next) => {
     try {
         const matchId = req.params.matchId;
-        const regionUrl = handleRegionRequests(req.session.region);
+        const checkRegion = regionCheck(req.params.region);
+        if (checkRegion.errors) throw checkRegion;
+
+        const regionUrl = handleRegionRequests(req.params.region);
         const matchInfoRes = await fetch(`${regionUrl}/lol/match/v4/matches/${matchId}`, {
             headers: { 'X-Riot-Token': riotKey }
         });

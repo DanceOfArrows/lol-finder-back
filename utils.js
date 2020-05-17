@@ -119,6 +119,30 @@ const handleRegionRequests = (region) => {
     if (region === 'RU') return RU;
 };
 
+// Check region
+const regionCheck = (requestRegion) => {
+    // if requestRegion is not equal to any regions, return false 
+    if (requestRegion !== 'BR1' &&
+        requestRegion !== 'EUN1' &&
+        requestRegion !== 'EUW1' &&
+        requestRegion !== 'JP1' &&
+        requestRegion !== 'KR' &&
+        requestRegion !== 'LA1' &&
+        requestRegion !== 'LA2' &&
+        requestRegion !== 'NA1' &&
+        requestRegion !== 'OC1' &&
+        requestRegion !== 'TR1' &&
+        requestRegion !== 'RU'
+    ) {
+        const err = Error("Invalid Region.");
+        err.errors = [`${requestRegion} is not a valid region`];
+        err.status = 400;
+        err.title = "Bad request.";
+        return err;
+    }
+    return true;
+}
+
 //Error handler for all thing Riot
 const riotErrorHandling = (errRes) => {
     const err = Error(`${errRes.statusText}`);
@@ -137,5 +161,6 @@ module.exports = {
     getChampionId,
     getSummonerInfo,
     handleRegionRequests,
+    regionCheck,
     riotErrorHandling
 };

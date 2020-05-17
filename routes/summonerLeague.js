@@ -1,21 +1,24 @@
 const express = require('express');
 const fetch = require("node-fetch");
 
-const { asyncHandler, getSummonerInfo, handleRegionRequests, riotErrorHandling } = require('../utils');
+const { asyncHandler, getSummonerInfo, handleRegionRequests, regionCheck, riotErrorHandling } = require('../utils');
 const { riotKey } = require('../config');
 
 const router = express.Router();
 
 // Gets rank, wins, and losses of the current season
-router.get('/:summonerName', asyncHandler(async (req, res, next) => {
+router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
     try {
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.session.region);
+        const checkRegion = regionCheck(req.params.region);
+        if (checkRegion.errors) throw checkRegion;
+
+        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.params.region);
         if (summonerInfoRes.errors) {
             throw summonerInfoRes;
         }
         const { id } = summonerInfoRes;
 
-        const regionUrl = handleRegionRequests(req.session.region, req.session.region);
+        const regionUrl = handleRegionRequests(req.params.region, req.params.region);
         const leagueRes = await fetch(`${regionUrl}/lol/league/v4/entries/by-summoner/${id}`, {
             headers: { 'X-Riot-Token': riotKey }
         });

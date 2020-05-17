@@ -26,12 +26,6 @@ app.use(session({
   secret: "this is a secret yes."
 }));
 
-// Middleware to set default region to NA1
-app.use(function (req, res, next) {
-  if (!req.session.region) req.session.region = 'NA1';
-  next();
-});
-
 app.use('/rotation', champRotation); // Free champ rotation
 app.use('/region', regionControl); // Change region to make requests to
 app.use('/mastery', summonerMastery); // Mastery points

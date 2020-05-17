@@ -1,21 +1,24 @@
 const express = require('express');
 const fetch = require("node-fetch");
 
-const { asyncHandler, convertChampionId, getChampionId, getSummonerInfo, handleRegionRequests, riotErrorHandling } = require('../utils');
+const { asyncHandler, convertChampionId, getChampionId, getSummonerInfo, handleRegionRequests, regionCheck, riotErrorHandling } = require('../utils');
 const { riotKey } = require('../config');
 
 const router = express.Router();
 
 // All champion mastery
-router.get('/:summonerName', asyncHandler(async (req, res, next) => {
+router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
     try {
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.session.region);
+        const checkRegion = regionCheck(req.params.region);
+        if (checkRegion.errors) throw checkRegion;
+
+        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.params.region);
         if (summonerInfoRes.errors) {
             throw summonerInfoRes;
         }
         const { id } = summonerInfoRes;
 
-        const regionUrl = handleRegionRequests(req.session.region);
+        const regionUrl = handleRegionRequests(req.params.region);
         const masteriesRes = await fetch(`${regionUrl}/lol/champion-mastery/v4/champion-masteries/by-summoner/${id}`, {
             headers: { 'X-Riot-Token': riotKey }
         });
@@ -42,15 +45,15 @@ router.get('/:summonerName', asyncHandler(async (req, res, next) => {
 }));
 
 // Total mastery score
-router.get('/:summonerName/score', asyncHandler(async (req, res, next) => {
+router.get('/:region/:summonerName/score', asyncHandler(async (req, res, next) => {
     try {
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.session.region);
+        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.params.region);
         if (summonerInfoRes.errors) {
             throw summonerInfoRes;
         }
         const { id } = summonerInfoRes;
 
-        const regionUrl = handleRegionRequests(req.session.region);
+        const regionUrl = handleRegionRequests(req.params.region);
         const masteryScoreRes = await fetch(`${regionUrl}/lol/champion-mastery/v4/scores/by-summoner/${id}`, {
             headers: { 'X-Riot-Token': riotKey }
         });
@@ -68,9 +71,9 @@ router.get('/:summonerName/score', asyncHandler(async (req, res, next) => {
 }));
 
 // Specific champion mastery
-router.get('/:summonerName/:championName', asyncHandler(async (req, res, next) => {
+router.get('/:region/:summonerName/:championName', asyncHandler(async (req, res, next) => {
     try {
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.session.region);
+        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.params.region);
         if (summonerInfoRes.errors) {
             throw summonerInfoRes;
         }
@@ -81,7 +84,7 @@ router.get('/:summonerName/:championName', asyncHandler(async (req, res, next) =
             throw championId;
         }
 
-        const regionUrl = handleRegionRequests(req.session.region);
+        const regionUrl = handleRegionRequests(req.params.region);
         const masteryRes = await fetch(`${regionUrl}/lol/champion-mastery/v4/champion-masteries/by-summoner/${id}/by-champion/${championId}`, {
             headers: { 'X-Riot-Token': riotKey }
         });
