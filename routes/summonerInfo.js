@@ -1,6 +1,7 @@
 const express = require('express');
 const fetch = require("node-fetch");
 
+const db = require('../db/models');
 const {
     asyncHandler,
     convertChampionId,
@@ -11,6 +12,8 @@ const {
     regionCheck,
     riotErrorHandling,
 } = require('../utils');
+
+const { PlayerInfo } = db;
 const { riotKey } = require('../config');
 
 const router = express.Router();
@@ -21,7 +24,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
         const checkRegion = regionCheck(req.params.region);
         if (checkRegion.errors) throw checkRegion;
 
-        const summoner = await getSummonerInfo(req.params.summonerName, req.params.region);
+        let summoner = await getSummonerInfo(req.params.summonerName, req.params.region);
 
         let dateCheck;
         if (summoner) {
@@ -30,20 +33,9 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
 
         if (!summoner || dateCheck) {
             const regionUrl = handleRegionRequests(req.params.region);
-            const {
-                summonerName,
-                summonerIcon,
-                summonerLevel,
-                summonerId,
-                accountId,
-                matchHistory,
-                rank,
-                mastery,
-                masteryScore,
-            } = summoner;
 
             // Get player account info => Returns JSON
-            const playerInfoRes = await fetch(`${regionUrl}/lol/summoner/v4/summoners/by-name/${summonerName}`, {
+            const playerInfoRes = await fetch(`${regionUrl}/lol/summoner/v4/summoners/by-name/${req.params.summonerName}`, {
                 headers: { 'X-Riot-Token': riotKey }
             });
 
@@ -59,7 +51,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                         summonerIcon: profileIconId,
                         summonerLevel: summonerLevel,
                     })
-                    await player.save();
+                    await summoner.save();
                 } else {
                     summoner.summonerId = id;
                     summoner.accountId = accountId;
@@ -74,6 +66,61 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                 err.status = 404;
                 err.title = "Not Found.";
                 return err;
+            }
+
+            const {
+                accountId,
+                summonerId,
+            } = summoner;
+
+            // Get Player Match History => Returns JSON
+            // Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
+            const championId = req.query.champion;
+            const queueId = req.query.queue;
+            const seasonId = req.query.season;
+            const startIndex = req.query.startIndex;
+            const endIndex = req.query.endIndex;
+
+            const joinQueries = () => {
+                let urlQueries = [];
+
+                if (championId) urlQueries.push(`champion=${championId}`);
+                if (queueId) urlQueries.push(`queue=${queueId}`);
+                if (seasonId) urlQueries.push(`season=${seasonId}`);
+                if (startIndex) urlQueries.push(`startIndex=${startIndex}`);
+                if (endIndex) urlQueries.push(`endIndex=${endIndex}`);
+
+                return urlQueries.join('&');
+            }
+
+            const joinedUrlQueries = championId || queueId || seasonId || startIndex || endIndex ? '?' + joinQueries() : ''
+
+            const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}${joinedUrlQueries}`, {
+                headers: { 'X-Riot-Token': riotKey }
+            });
+
+            if (matchHistoryRes.ok) {
+                const matchHistory = await matchHistoryRes.json();
+
+                // Removal of unneccessary / private data and conversion of numbers to readable data
+                const matchesPromise = matchHistory.matches.map(async match => {
+                    const matchId = match.gameId;
+                    const champion = await convertChampionId(match.champion);
+                    const [map, queueDescription] = await convertQueueId(match.queue);
+                    const season = await convertSeasonId(match.season);
+                    return { matchId, champion, map, queueDescription, season };
+                });
+
+                const matches = await Promise.all(matchesPromise);
+
+                if (summoner.matchHistory !== matches) {
+                    console.log('in')
+                    summoner.matchHistory = matches;
+                    await summoner.save();
+                }
+
+            } else {
+                throw (riotErrorHandling(matchHistoryRes));
             }
 
             // Get Player Mastery Score => Returns integer
@@ -136,54 +183,15 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                 throw (riotErrorHandling(leagueRes));
             }
 
-            // Get Player Match History => Returns JSON
-            // Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
-            const championId = req.query.champion;
-            const queueId = req.query.queue;
-            const seasonId = req.query.season;
-            const startIndex = req.query.startIndex;
-            const endIndex = req.query.endIndex;
-
-            const joinQueries = () => {
-                let urlQueries = [];
-
-                if (championId) urlQueries.push(`champion=${championId}`);
-                if (queueId) urlQueries.push(`queue=${queueId}`);
-                if (seasonId) urlQueries.push(`season=${seasonId}`);
-                if (startIndex) urlQueries.push(`startIndex=${startIndex}`);
-                if (endIndex) urlQueries.push(`endIndex=${endIndex}`);
-
-                return urlQueries.join('&');
-            }
-
-            const joinedUrlQueries = championId || queueId || seasonId || startIndex || endIndex ? '?' + joinQueries() : ''
-
-            const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}${joinedUrlQueries}`, {
-                headers: { 'X-Riot-Token': riotKey }
-            });
-
-            if (matchHistoryRes.ok) {
-                const matchHistory = await matchHistoryRes.json();
-
-                // Removal of unneccessary / private data and conversion of numbers to readable data
-                const matchesPromise = matchHistory.matches.map(async match => {
-                    const matchId = match.gameId;
-                    const champion = await convertChampionId(match.champion);
-                    const [map, queueDescription] = await convertQueueId(match.queue);
-                    const season = await convertSeasonId(match.season);
-                    return { matchId, champion, map, queueDescription, season };
-                });
-
-                const matches = await Promise.all(matchesPromise);
-
-                if (summoner.matchHistory !== matches) {
-                    summoner.matchHistory = matches;
-                    await summoner.save();
-                }
-
-            } else {
-                throw (riotErrorHandling(matchHistoryRes));
-            }
+            const {
+                summonerName,
+                summonerIcon,
+                summonerLevel,
+                matchHistory,
+                rank,
+                mastery,
+                masteryScore,
+            } = summoner;
 
             res.json({
                 summonerName,
@@ -194,7 +202,8 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                 mastery,
                 masteryScore,
             })
-        } else {
+        }
+        if (summoner && !dateCheck) {
             const {
                 summonerName,
                 summonerIcon,
