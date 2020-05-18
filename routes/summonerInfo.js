@@ -151,10 +151,18 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
 
             if (leagueRes.ok) {
                 const playerRank = await leagueRes.json();
+                let soloRank;
+
+                playerRank.forEach(type => {
+                    if (type.queueType === 'RANKED_SOLO_5x5') soloRank = type;
+                })
+
+                const { tier, rank, leaguePoints, wins, losses } = soloRank;
+                const rankObj = { tier, rank, leaguePoints, wins, losses };
 
                 // Returns the object inside of an array
-                if (!summoner.rank || summoner.rank !== playerRank) {
-                    summoner.rank = playerRank;
+                if (!summoner.rank || summoner.rank !== rank) {
+                    summoner.rank = rankObj;
                     await summoner.save();
                 }
             } else {
