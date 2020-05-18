@@ -87,13 +87,14 @@ const convertSeasonTimestamp = async (timestamp, region) => {
 };
 
 // Check if summoner is in database
-const getSummonerInfo = async (summonerName) => {
+const getSummonerInfo = async (summonerName, region) => {
     const name = decodeURIComponent(summonerName);
     let player = await PlayerInfo.findOne({
         where: {
             summonerName: {
                 [Op.iLike]: name,
             },
+            region: region,
         }
     });
     if (player) {

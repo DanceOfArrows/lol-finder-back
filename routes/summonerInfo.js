@@ -50,6 +50,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                         accountId: accountId,
                         summonerIcon: profileIconId,
                         summonerLevel: summonerLevel,
+                        region: req.params.region,
                     })
                     await summoner.save();
                 } else {
@@ -58,6 +59,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                     summoner.summonerName = name;
                     summoner.summonerIcon = profileIconId;
                     summoner.summonerLevel = summonerLevel;
+                    summoner.region = req.params.region;
                     await summoner.save();
                 }
             } else {
@@ -169,6 +171,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                 rank,
                 mastery,
                 masteryScore,
+                region,
             } = summoner;
 
             res.json({
@@ -179,6 +182,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                 rank,
                 mastery,
                 masteryScore,
+                region,
             })
         } else {
             const {

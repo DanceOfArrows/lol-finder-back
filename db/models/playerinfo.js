@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     rank: DataTypes.JSON,
     mastery: DataTypes.JSON,
     masteryScore: DataTypes.INTEGER,
+    region: DataTypes.STRING,
   }, {});
   PlayerInfo.associate = function (models) {
     // associations can be defined here

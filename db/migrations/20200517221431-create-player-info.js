@@ -35,6 +35,9 @@ module.exports = {
       masteryScore: {
         type: Sequelize.INTEGER
       },
+      region: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
