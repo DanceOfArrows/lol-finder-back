@@ -151,12 +151,10 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
 
             if (leagueRes.ok) {
                 const playerRank = await leagueRes.json();
-                const { tier, rank, leaguePoints, wins, losses } = playerRank[0];
-                const rankObj = { tier, rank, leaguePoints, wins, losses };
 
                 // Returns the object inside of an array
-                if (!summoner.rank || summoner.rank !== rank) {
-                    summoner.rank = rankObj;
+                if (!summoner.rank || summoner.rank !== playerRank) {
+                    summoner.rank = playerRank;
                     await summoner.save();
                 }
             } else {
