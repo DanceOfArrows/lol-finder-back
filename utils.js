@@ -54,11 +54,36 @@ const convertQueueId = async (queueId) => {
     return [queue.map, queue.description];
 };
 
-//Converts season id into the name of the seasons (shortened to `S${seasonNumber}`)
-const convertSeasonId = async (seasonId) => {
-    const season = await Season.findByPk(seasonId);
+//Converts timestamp into the name of the seasons
+const convertSeasonTimestamp = async (timestamp, region) => {
+    let adjustedTime;
 
-    return season.seasonName;
+    if (region === 'BR1') adjustedTime = timestamp - 3600;
+    if (region === 'EUN1') adjustedTime = timestamp - 21600;
+    if (region === 'EUW1') adjustedTime = timestamp - 10800;
+    if (region === 'JP1') adjustedTime = timestamp - 43200;
+    if (region === 'KR') adjustedTime = timestamp - 39600;
+    if (region === 'LA1') adjustedTime = timestamp + 7200;
+    if (region === 'LA2') adjustedTime = timestamp;
+    if (region === 'NA1') adjustedTime = timestamp + 10800;
+    if (region === 'OC1') adjustedTime = timestamp - 46800;
+    if (region === 'TR1') adjustedTime = timestamp - 18000;
+    if (region === 'RU') adjustedTime = timestamp - 28800;
+
+    if (adjustedTime >= 1359691200 && adjustedTime < 1389772800) return 'Season 3';
+    if (adjustedTime >= 1389772800 && adjustedTime < 1421308800) return 'Season 4';
+    if (adjustedTime >= 1421308800 && adjustedTime < 1452758400) return 'Season 5';
+    if (adjustedTime >= 1452758400 && adjustedTime < 1484121600) return 'Season 6';
+    if (adjustedTime >= 1484121600 && adjustedTime < 1515571200) return 'Season 7';
+    if (adjustedTime >= 1515571200 && adjustedTime < 1547020800) return 'Season 8';
+    if (adjustedTime >= 1547020800 && adjustedTime < 1578477600) return 'Season 9';
+    if (adjustedTime >= 1578477600 && adjustedTime < Date.parse((new Date()))) return 'Season 10';
+
+    const err = Error("Invalid Timestamp.");
+    err.errors = [`Failed to convert timestamp to season.`];
+    err.status = 400;
+    err.title = "Not Found.";
+    return err;
 };
 
 // Check if summoner is in database
@@ -154,7 +179,7 @@ module.exports = {
     convertChampionId,
     convertFreeRotation,
     convertQueueId,
-    convertSeasonId,
+    convertSeasonTimestamp,
     getChampionId,
     getSummonerInfo,
     handleRegionRequests,

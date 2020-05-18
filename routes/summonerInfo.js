@@ -6,7 +6,7 @@ const {
     asyncHandler,
     convertChampionId,
     convertQueueId,
-    convertSeasonId,
+    convertSeasonTimestamp,
     getSummonerInfo,
     handleRegionRequests,
     regionCheck,
@@ -74,28 +74,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
             } = summoner;
 
             // Get Player Match History => Returns JSON
-            // Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
-            const championId = req.query.champion;
-            const queueId = req.query.queue;
-            const seasonId = req.query.season;
-            const startIndex = req.query.startIndex;
-            const endIndex = req.query.endIndex;
-
-            const joinQueries = () => {
-                let urlQueries = [];
-
-                if (championId) urlQueries.push(`champion=${championId}`);
-                if (queueId) urlQueries.push(`queue=${queueId}`);
-                if (seasonId) urlQueries.push(`season=${seasonId}`);
-                if (startIndex) urlQueries.push(`startIndex=${startIndex}`);
-                if (endIndex) urlQueries.push(`endIndex=${endIndex}`);
-
-                return urlQueries.join('&');
-            }
-
-            const joinedUrlQueries = championId || queueId || seasonId || startIndex || endIndex ? '?' + joinQueries() : ''
-
-            const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}${joinedUrlQueries}`, {
+            const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}`, {
                 headers: { 'X-Riot-Token': riotKey }
             });
 
@@ -107,14 +86,13 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                     const matchId = match.gameId;
                     const champion = await convertChampionId(match.champion);
                     const [map, queueDescription] = await convertQueueId(match.queue);
-                    const season = await convertSeasonId(match.season);
+                    const season = await convertSeasonTimestamp(match.timestamp, req.params.region);
                     return { matchId, champion, map, queueDescription, season };
                 });
 
                 const matches = await Promise.all(matchesPromise);
 
                 if (summoner.matchHistory !== matches) {
-                    console.log('in')
                     summoner.matchHistory = matches;
                     await summoner.save();
                 }
@@ -202,8 +180,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                 mastery,
                 masteryScore,
             })
-        }
-        if (summoner && !dateCheck) {
+        } else {
             const {
                 summonerName,
                 summonerIcon,

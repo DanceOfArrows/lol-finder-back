@@ -27,7 +27,6 @@ router.get('/:region', asyncHandler(async (req, res, next) => {
             const getRotationRes = await fetch(`${regionUrl}/lol/platform/v3/champion-rotations/`, {
                 headers: { 'X-Riot-Token': riotKey }
             });
-            console.log('pinged riot')
 
             if (getRotationRes.ok) {
                 const rotations = await getRotationRes.json();
