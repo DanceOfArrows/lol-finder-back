@@ -6,9 +6,8 @@ const path = require('path');
 
 const { environment } = require("./config");
 const champRotation = require('./routes/champRotation');
-const summonerMastery = require('./routes/summonerMastery');
 const summonerHistory = require('./routes/summonerHistory');
-const summonerLeague = require('./routes/summonerLeague');
+const summonerInfo = require('./routes/summonerInfo');
 
 const app = express();
 
@@ -17,13 +16,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
-
+// app.use(cors({ origin: ['https://lol-finder.herokuapp.com', 'http://localhost:3000'] }));
+app.use(cors({ origin: true }));
+app.use('/info', summonerInfo); // Player data
+app.use('/match', summonerHistory); // Specific match info
 app.use('/rotation', champRotation); // Free champ rotation
-app.use('/mastery', summonerMastery); // Mastery points
-app.use('/match-history', summonerHistory); // Match history of player
-app.use('/league', summonerLeague) // Player rank
-
 
 // Catch unhandled requests and forward to error handler.
 app.use((req, res, next) => {

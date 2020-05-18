@@ -1,9 +1,8 @@
-const fetch = require("node-fetch");
 const { Op } = require("sequelize");
 
 const db = require("./db/models");
 const platformUrls = require('./routes/url-names');
-const { riotKey } = require('./config');
+
 
 // Import urls from url file
 const urls = platformUrls.urls;
@@ -12,7 +11,7 @@ const { BR1, EUN1, EUW1, JP1, KR, LA1, LA2, NA1, OC1, TR1, RU } = urls;
 const asyncHandler = handler => (req, res, next) => handler(req, res, next).catch(next);
 
 //Destructure models because I like it
-const { Champion, QueueType, Season } = db;
+const { Champion, PlayerInfo, QueueType, Season } = db;
 
 //Turns a champion's id into their name
 const convertChampionId = async (championId) => {
@@ -62,22 +61,20 @@ const convertSeasonId = async (seasonId) => {
     return season.seasonName;
 };
 
-//Gets the summoner info from riot in order to use encrypted id, accountId, etc.
-const getSummonerInfo = async (summonerName, region) => {
-    const regionUrl = handleRegionRequests(region);
-    const res = await fetch(`${regionUrl}/lol/summoner/v4/summoners/by-name/${summonerName}`, {
-        headers: { 'X-Riot-Token': riotKey }
+// Check if summoner is in database
+const getSummonerInfo = async (summonerName) => {
+    const name = decodeURIComponent(summonerName);
+    let player = await PlayerInfo.findOne({
+        where: {
+            summonerName: {
+                [Op.iLike]: name,
+            },
+        }
     });
-
-    if (res.ok) {
-        const accountInfo = await res.json();
-        return accountInfo;
+    if (player) {
+        return player;
     } else {
-        const err = Error("Summoner not found.");
-        err.errors = [`An error occurred when trying to fetch summoner data.`];
-        err.status = 404;
-        err.title = "Not Found.";
-        return err;
+        return '';
     };
 };
 
@@ -121,7 +118,7 @@ const handleRegionRequests = (region) => {
 
 // Check region
 const regionCheck = (requestRegion) => {
-    // if requestRegion is not equal to any regions, return false 
+    // if requestRegion is not equal to any regions, return error 
     if (requestRegion !== 'BR1' &&
         requestRegion !== 'EUN1' &&
         requestRegion !== 'EUW1' &&
@@ -140,7 +137,7 @@ const regionCheck = (requestRegion) => {
         err.title = "Bad request.";
         return err;
     }
-    return true;
+    return requestRegion;
 }
 
 //Error handler for all thing Riot

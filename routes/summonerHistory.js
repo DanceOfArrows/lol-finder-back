@@ -1,105 +1,64 @@
 const express = require('express');
 const fetch = require("node-fetch");
 
+const db = require('../db/models');
 const { asyncHandler,
-    convertChampionId,
-    convertQueueId,
-    convertSeasonId,
-    getSummonerInfo,
     handleRegionRequests,
     regionCheck,
-    riotErrorHandling
 } = require('../utils');
 const { riotKey } = require('../config');
 
+const { Match } = db;
 const router = express.Router();
 
-// Get all matches by user
-router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
-    try {
-        // Request should look like `http://localhost:8080/match-history/Kindred+ADC?champion=203&queue=450&season=13`
-        const championId = req.query.champion;
-        const queueId = req.query.queue;
-        const seasonId = req.query.season;
-        const startIndex = req.query.startIndex;
-        const endIndex = req.query.endIndex;
-
-        const checkRegion = regionCheck(req.params.region);
-        if (checkRegion.errors) throw checkRegion;
-
-        const summonerInfoRes = await getSummonerInfo(req.params.summonerName, req.params.region);
-        if (summonerInfoRes.errors) {
-            throw summonerInfoRes;
-        }
-        const { accountId } = summonerInfoRes;
-
-        const joinQueries = () => {
-            let urlQueries = [];
-
-            if (championId) urlQueries.push(`champion=${championId}`);
-            if (queueId) urlQueries.push(`queue=${queueId}`);
-            if (seasonId) urlQueries.push(`season=${seasonId}`);
-            if (startIndex) urlQueries.push(`startIndex=${startIndex}`);
-            if (endIndex) urlQueries.push(`endIndex=${endIndex}`);
-
-            return urlQueries.join('&');
-        }
-
-        const joinedUrlQueries = championId || queueId || seasonId || startIndex || endIndex ? '?' + joinQueries() : ''
-
-        const regionUrl = handleRegionRequests(req.params.region);
-        const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}${joinedUrlQueries}`, {
-            headers: { 'X-Riot-Token': riotKey }
-        });
-
-        if (matchHistoryRes.ok) {
-            const matchHistory = await matchHistoryRes.json();
-
-            // Removal of unneccessary / private data and conversion of numbers to readable data
-            const matchesPromise = matchHistory.matches.map(async match => {
-                const matchId = match.gameId;
-                const champion = await convertChampionId(match.champion);
-                const [map, queueDescription] = await convertQueueId(match.queue);
-                const season = await convertSeasonId(match.season);
-                return { matchId, champion, map, queueDescription, season };
-            });
-
-            const matches = await Promise.all(matchesPromise);
-            res.json(matches)
-        } else {
-            throw (riotErrorHandling(matchHistoryRes));
-        }
-    } catch (e) {
-        next(e);
-    }
-}));
-
 // Get details of a single match
-router.get('/:region/:summonerName/:matchId', asyncHandler(async (req, res, next) => {
+router.get('/:region/:matchId', asyncHandler(async (req, res, next) => {
     try {
         const matchId = req.params.matchId;
         const checkRegion = regionCheck(req.params.region);
         if (checkRegion.errors) throw checkRegion;
 
-        const regionUrl = handleRegionRequests(req.params.region);
-        const matchInfoRes = await fetch(`${regionUrl}/lol/match/v4/matches/${matchId}`, {
-            headers: { 'X-Riot-Token': riotKey }
+        let match = await Match.findOne({
+            where: {
+                matchId: matchId,
+            }
         });
 
-        if (matchInfoRes.ok) {
-            const match = await matchInfoRes.json();
-            // Removal of unneccessary / private data
-            const { gameDuration, teams, participants, participantIdentities } = match;
-            const playerInfo = participantIdentities.map(participant => {
-                const player = participant.player;
-                const participantId = participant.participantId;
-                const { summonerName, profileIcon } = player;
+        const regionUrl = handleRegionRequests(req.params.region);
 
-                return { participantId: participantId, player: { summonerName: summonerName, profileIcon: profileIcon } }
-            })
-            res.json({ gameDuration, teams, participants, participantIdentities: playerInfo });
+        if (!match) {
+            const matchInfoRes = await fetch(`${regionUrl}/lol/match/v4/matches/${matchId}`, {
+                headers: { 'X-Riot-Token': riotKey }
+            });
+
+            if (matchInfoRes.ok) {
+                const matchRes = await matchInfoRes.json();
+                // Removal of unneccessary / private data
+                const { gameDuration, teams, participants, participantIdentities } = matchRes;
+                const summonerInfo = participantIdentities.map(participant => {
+                    console.log(participant)
+                    const summoner = participant.player;
+                    const participantId = participant.participantId;
+                    const { summonerName, profileIcon } = summoner;
+
+                    return { participantId: participantId, summoner: { summonerName: summonerName, profileIcon: profileIcon } }
+                })
+                const returnMatch = { gameDuration, teams, participants, participantIdentities: summonerInfo };
+
+                if (!match) {
+                    match = Match.build({
+                        matchId: matchId,
+                        matchInfo: returnMatch,
+                    })
+                    await match.save();
+                }
+
+                res.json(returnMatch);
+            } else {
+                throw (matchInfoRes);
+            }
         } else {
-            throw (matchInfoRes);
+            res.json(match.matchInfo);
         }
     } catch (e) {
         next(e);
