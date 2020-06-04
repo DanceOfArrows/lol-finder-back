@@ -1,7 +1,8 @@
 # LoL Finder
-LoL Finder allows users to find profile data of players in the popular MOBA game "League of Legends".  The data can normally be found within
-the client's search function, but is inaccessible while in-game or not on a desktop.  This goal of this app is to alleviates this issue and to 
-also display player data in an easy to read manner.
+LoL Finder allows users to find profile data of players in the popular MOBA game "League of Legends".  
+The data can normally be found within the client's search function, but is inaccessible while in-game or not 
+on a desktop.  This goal of this app is to alleviates this issue and to also display player data in an 
+easy to read manner.  Champions refer to the playable characters in the game.
 
 Feature List:  
 * Displays the current free champion rotation on the home page
@@ -19,26 +20,18 @@ List of Riot API's used:
 * Summoner v4
 
 BackEnd Routes
-1. Champion
-   * `/champion/rotation`
+1. Info
+   * `/info`
+     * Get requested player's rank, match-history, and relevant account info
+2. Match
+   * `/match`
+     * Get specific match info
+3. Champion
+   * `/rotation`
      * Get current free champion rotation
-2. Champion Mastery
-   * `/mastery/:summonerName`
-     * Get all champion mastery for specified summoner
-   * `/mastery/:summonerName/:championName`
-     * Get champion mastery of a specific champion for specified summoner
-   * `/mastery/:summonerName/score`
-     * Get total mastery score for specified summoner
-3. League 
-   * `/league/:summonerName`
-     * Get the rank of the summoner
-4. Match
-   * `/match-history/:summonerName`
-     * Get matchlist for specified summoner
-   * `/match-history/:matchId `
-     * Get match by match ID
+
 
 FrontEnd Routes  
 1. Home Page (`/`)
-2. Summoner Page (`/summoner/:summonerName`)
-3. Mastery Page (`/summoner/:summonerName/mastery`)
+2. Rotation Page (`/rotation`) - Current free champion rotation
+3. Summoner Page (`/summoner/:summonerName`) - Player info, match history, and player's champion mastery
