@@ -76,7 +76,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
             } = summoner;
 
             // Get Player Match History => Returns JSON
-            const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}`, {
+            const matchHistoryRes = await fetch(`${regionUrl}/lol/match/v4/matchlists/by-account/${accountId}?endIndex=10&beginIndex=0`, {
                 headers: { 'X-Riot-Token': riotKey }
             });
 
