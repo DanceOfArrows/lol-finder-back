@@ -6,6 +6,7 @@ const path = require('path');
 
 const { environment } = require("./config");
 const champRotation = require('./routes/champRotation');
+const leaderboards = require('./routes/leaderboards');
 const summonerHistory = require('./routes/summonerHistory');
 const summonerInfo = require('./routes/summonerInfo');
 
@@ -19,6 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use(cors({ origin: ['https://lol-finder.herokuapp.com', 'http://localhost:3000'] }));
 app.use(cors({ origin: true }));
 app.use('/info', summonerInfo); // Player data
+app.use('/leaderboard', leaderboards);
 app.use('/match', summonerHistory); // Specific match info
 app.use('/rotation', champRotation); // Free champ rotation
 
