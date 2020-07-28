@@ -45,6 +45,7 @@ const convertFreeRotation = async (champRotationObj) => {
 
 //Converts the queue id to the map name and queue type name
 const convertQueueId = async (queueId) => {
+    console.log
     const queue = await QueueType.findOne({
         where: {
             queueId: queueId,

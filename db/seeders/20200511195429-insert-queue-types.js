@@ -356,6 +356,14 @@ module.exports = {
         updatedAt: new Date(),
       },
       {
+        queueId: 1300,
+        map: "Summoner's Rift",
+        description: "Nexus Blitz",
+        notes: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
         queueId: 2000,
         map: "Summoner's Rift",
         description: "Tutorial 1",

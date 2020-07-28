@@ -35,7 +35,7 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
             const regionUrl = handleRegionRequests(req.params.region);
 
             // Get player account info => Returns JSON
-            const playerInfoRes = await fetch(`${regionUrl}/lol/summoner/v4/summoners/by-name/${req.params.summonerName}`, {
+            const playerInfoRes = await fetch(`${regionUrl}/lol/summoner/v4/summoners/by-name/${encodeURI(req.params.summonerName)}`, {
                 headers: { 'X-Riot-Token': riotKey }
             });
 

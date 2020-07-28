@@ -36,7 +36,6 @@ router.get('/:region/:matchId', asyncHandler(async (req, res, next) => {
                 // Removal of unneccessary / private data
                 const { gameDuration, teams, participants, participantIdentities } = matchRes;
                 const summonerInfo = participantIdentities.map(participant => {
-                    console.log(participant)
                     const summoner = participant.player;
                     const participantId = participant.participantId;
                     const { summonerName, profileIcon } = summoner;
