@@ -157,13 +157,15 @@ router.get('/:region/:summonerName', asyncHandler(async (req, res, next) => {
                     if (type.queueType === 'RANKED_SOLO_5x5') soloRank = type;
                 })
 
-                const { tier, rank, leaguePoints, wins, losses } = soloRank;
-                const rankObj = { tier, rank, leaguePoints, wins, losses };
+                if (soloRank.tier) {
+                    const { tier, rank, leaguePoints, wins, losses } = soloRank;
+                    const rankObj = { tier, rank, leaguePoints, wins, losses };
 
-                // Returns the object inside of an array
-                if (!summoner.rank || summoner.rank !== rank) {
-                    summoner.rank = rankObj;
-                    await summoner.save();
+                    // Returns the object inside of an array
+                    if (!summoner.rank || summoner.rank !== rank) {
+                        summoner.rank = rankObj;
+                        await summoner.save();
+                    }
                 }
             } else {
                 throw (riotErrorHandling(leagueRes));

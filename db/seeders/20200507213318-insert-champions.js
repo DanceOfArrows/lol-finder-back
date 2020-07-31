@@ -67,6 +67,7 @@ module.exports = {
       { championId: 7, championName: "Leblanc", createdAt: new Date(), updatedAt: new Date() },
       { championId: 64, championName: "LeeSin", createdAt: new Date(), updatedAt: new Date() },
       { championId: 89, championName: "Leona", createdAt: new Date(), updatedAt: new Date() },
+      { championId: 876, championName: "Lillia", createdAt: new Date(), updatedAt: new Date() },
       { championId: 127, championName: "Lissandra", createdAt: new Date(), updatedAt: new Date() },
       { championId: 236, championName: "Lucian", createdAt: new Date(), updatedAt: new Date() },
       { championId: 117, championName: "Lulu", createdAt: new Date(), updatedAt: new Date() },
