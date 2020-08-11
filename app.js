@@ -5,6 +5,7 @@ const logger = require('morgan');
 const path = require('path');
 
 const { environment } = require("./config");
+const index = require('./routes/index');
 const champRotation = require('./routes/champRotation');
 const leaderboards = require('./routes/leaderboards');
 const summonerHistory = require('./routes/summonerHistory');
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // app.use(cors({ origin: ['https://lol-finder.herokuapp.com', 'http://localhost:3000'] }));
+app.use('/', index);
 app.use(cors({ origin: true }));
 app.use('/info', summonerInfo); // Player data
 app.use('/leaderboard', leaderboards);
