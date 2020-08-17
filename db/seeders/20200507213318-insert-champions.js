@@ -144,6 +144,7 @@ module.exports = {
       { championId: 101, championName: "Xerath", createdAt: new Date(), updatedAt: new Date() },
       { championId: 5, championName: "XinZhao", createdAt: new Date(), updatedAt: new Date() },
       { championId: 157, championName: "Yasuo", createdAt: new Date(), updatedAt: new Date() },
+      { championId: 777, championName: "Yone", createdAt: new Date(), updatedAt: new Date() },
       { championId: 83, championName: "Yorick", createdAt: new Date(), updatedAt: new Date() },
       { championId: 350, championName: "Yuumi", createdAt: new Date(), updatedAt: new Date() },
       { championId: 154, championName: "Zac", createdAt: new Date(), updatedAt: new Date() },

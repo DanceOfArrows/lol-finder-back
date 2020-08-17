@@ -50,7 +50,9 @@ router.get('/:region/:matchId', asyncHandler(async (req, res, next) => {
                 })
                 const summonerGameInfo = await Promise.all(participants.map(async participant => {
                     const { championId, ...otherData } = participant;
+                    console.log(championId)
                     const championName = await convertChampionId(championId);
+                    console.log(championName)
 
                     return { championName, ...otherData };
                 }));
