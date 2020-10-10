@@ -102,6 +102,7 @@ module.exports = {
       { championId: 92, championName: "Riven", createdAt: new Date(), updatedAt: new Date() },
       { championId: 68, championName: "Rumble", createdAt: new Date(), updatedAt: new Date() },
       { championId: 13, championName: "Ryze", createdAt: new Date(), updatedAt: new Date() },
+      { championId: 360, championName: "Samira", createdAt: new Date(), updatedAt: new Date() },
       { championId: 113, championName: "Sejuani", createdAt: new Date(), updatedAt: new Date() },
       { championId: 235, championName: "Senna", createdAt: new Date(), updatedAt: new Date() },
       { championId: 875, championName: "Sett", createdAt: new Date(), updatedAt: new Date() },

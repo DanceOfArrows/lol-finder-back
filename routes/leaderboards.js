@@ -45,7 +45,7 @@ router.get('/:region', asyncHandler(async (req, res, next) => {
                 })
                 res.json(leaderboardRes);
             } else {
-                throw (riotErrorHandling(getRotationRes))
+                throw (riotErrorHandling(leaderboardRes))
             }
         } else {
             const leaderboardRes = currentLeaderboard.leaderboard.map(summoner => {

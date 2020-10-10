@@ -21,6 +21,8 @@ const convertChampionId = async (championId) => {
         }
     })
 
+    if (!champion) console.log(championId);
+
     return champion.championName;
 }
 
