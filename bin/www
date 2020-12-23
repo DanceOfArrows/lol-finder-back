@@ -7,7 +7,13 @@
 const app = require('../app');
 const debug = require('debug')('lol-finder:server');
 const http = require('http');
+const config = require("../config/index");
 
+const db = config.db;
+const username = db.username;
+const password = db.password;
+const database = db.database;
+const host = db.host;
 /**
  * Get port from environment and store in Express.
  */
