@@ -26,7 +26,7 @@
   "devDependencies": {
     "dotenv-cli": "^3.1.0",
     "faker": "^4.1.0",
-    "nodemon": "^2.0.2",
+    "nodemon": "^2.0.20",
     "sequelize-cli": "^5.5.1"
   }
 }
